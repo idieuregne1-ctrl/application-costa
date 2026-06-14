@@ -6,32 +6,44 @@ import { fetchJson } from '../lib/http.js'
 export const foursquareRouter = Router()
 
 /**
- * Proxy Foursquare Places API (v3).
- * Renforce le consensus multi-sources (« Recommandé sur Google + Foursquare »).
- * La clé FOURSQUARE_API_KEY reste côté serveur ; le frontend normalise la réponse.
+ * Proxy Foursquare Places API (nouvelle API, post-migration 2025).
+ *
+ * ⚠️ L'ancienne API v3 (api.foursquare.com/v3) a été RETIRÉE (HTTP 410). On cible
+ * donc la nouvelle API :
+ *   - base : https://places-api.foursquare.com/places/search
+ *   - auth : Authorization: Bearer <SERVICE_KEY>
+ *   - header de version requis : X-Places-Api-Version
+ * Les anciennes clés « fsq3… » de la v3 ne sont PAS acceptées : il faut une
+ * « Service Key » générée dans la console Foursquare à jour.
+ *
+ * La clé FOURSQUARE_API_KEY reste côté serveur ; le frontend normalise la réponse
+ * (de façon défensive, pour gérer les variations de schéma).
  */
 
-const FSQ_BASE = 'https://api.foursquare.com/v3/places/search'
+const FSQ_BASE = 'https://places-api.foursquare.com/places/search'
+const FSQ_API_VERSION = '2025-06-17'
 
 const FIELDS = [
-  'fsq_id',
+  'fsq_place_id',
   'name',
-  'geocodes',
+  'latitude',
+  'longitude',
   'location',
   'categories',
   'rating',
-  'stats',
   'price',
-  'photos',
   'hours',
+  'photos',
   'website',
+  'distance',
 ].join(',')
 
-/** Catégories Foursquare interrogées par catégorie d'app (IDs racine). */
-const FSQ_CATEGORIES: Record<string, string> = {
-  restaurant: '13000', // Dining and Drinking
-  activity: '10000', // Arts and Entertainment
-  culture: '10000,12000', // Arts & Entertainment + Community (musées, sites)
+/** Requête texte par défaut par catégorie (la taxonomie de catégories a changé,
+ *  la recherche texte est plus robuste à travers les versions). */
+const DEFAULT_QUERY: Record<string, string> = {
+  restaurant: 'restaurant',
+  activity: 'attraction',
+  culture: 'musée',
 }
 
 const schema = z.object({
@@ -48,24 +60,27 @@ foursquareRouter.get('/search', async (req, res, next) => {
     const key = requireKey(env.FOURSQUARE_API_KEY, 'FOURSQUARE_API_KEY')
     const params = schema.parse(req.query)
 
-    const categories = FSQ_CATEGORIES[params.category]
-    if (!categories && !params.query) {
+    const query = params.query ?? DEFAULT_QUERY[params.category]
+    if (!query) {
       return res.json({ results: [], note: `Catégorie « ${params.category} » non couverte par Foursquare.` })
     }
 
     const search = new URLSearchParams({
+      query,
       ll: `${params.lat},${params.lng}`,
       radius: String(params.radius),
       limit: '20',
       sort: 'POPULARITY',
       fields: FIELDS,
     })
-    if (categories) search.set('categories', categories)
-    if (params.query) search.set('query', params.query)
 
     const data = await fetchJson<{ results?: unknown[] }>(`${FSQ_BASE}?${search.toString()}`, {
       source: 'foursquare',
-      headers: { Authorization: key, Accept: 'application/json' },
+      headers: {
+        Authorization: `Bearer ${key}`,
+        'X-Places-Api-Version': FSQ_API_VERSION,
+        Accept: 'application/json',
+      },
     })
 
     res.json({ results: data.results ?? [] })
