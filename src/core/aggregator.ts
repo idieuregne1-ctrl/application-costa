@@ -51,8 +51,16 @@ export async function aggregate(params: AggregateParams): Promise<AggregateOutpu
   const raw: Place[] = []
   const failedSources: string[] = []
   settled.forEach((r, i) => {
-    if (r.status === 'fulfilled') raw.push(...r.value)
-    else failedSources.push(providers[i].source)
+    if (r.status === 'fulfilled') {
+      raw.push(...r.value)
+      return
+    }
+    // Une source SANS clé configurée n'est pas « en échec » — juste non activée.
+    // On ne signale que les vraies erreurs (réseau, quota, API down…).
+    const reason = r.reason as { status?: number; payload?: { error?: string } } | undefined
+    const isMissingKey =
+      reason?.status === 503 && reason?.payload?.error === 'missing_api_key'
+    if (!isMissingKey) failedSources.push(providers[i].source)
   })
 
   // 2. Déduplication + fusion multi-sources.

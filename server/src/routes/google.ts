@@ -38,11 +38,16 @@ const searchSchema = z.object({
   query: z.string().trim().min(1).max(200).optional(),
 })
 
-/** Types Google Places (New) interrogés par catégorie pour la recherche à proximité. */
+/**
+ * Types Google Places (New) interrogés par catégorie.
+ * On lance une recherche à proximité PAR TYPE en parallèle (chaque appel est
+ * plafonné à 20 par Google) puis on fusionne/déduplique → bien plus de choix
+ * qu'un seul appel (objectif 20-40+ lieux par catégorie).
+ */
 const TYPES_BY_CATEGORY: Record<string, string[]> = {
-  restaurant: ['restaurant'],
-  activity: ['tourist_attraction', 'amusement_park', 'park', 'night_club', 'art_gallery'],
-  culture: ['museum', 'art_gallery', 'historical_landmark', 'tourist_attraction'],
+  restaurant: ['restaurant', 'cafe', 'bar', 'bakery', 'meal_takeaway'],
+  activity: ['tourist_attraction', 'amusement_park', 'park', 'night_club', 'art_gallery', 'zoo'],
+  culture: ['museum', 'art_gallery', 'historical_landmark', 'performing_arts_theater'],
   // beach / hike passent par OSM ; fishing complète OSM via une recherche texte.
 }
 
@@ -52,6 +57,62 @@ const TYPES_BY_CATEGORY: Record<string, string[]> = {
  */
 const DEFAULT_TEXT_QUERY: Record<string, string> = {
   fishing: 'spot de pêche',
+}
+
+interface RawPlaceWithId {
+  id?: string
+}
+
+/** En-têtes communs des appels Places. */
+function placesHeaders(key: string): Record<string, string> {
+  return {
+    'Content-Type': 'application/json',
+    'X-Goog-Api-Key': key,
+    'X-Goog-FieldMask': SEARCH_FIELD_MASK,
+  }
+}
+
+/**
+ * Lance une recherche à proximité PAR TYPE en parallèle (chacune ≤ 20) et fusionne
+ * en dédupliquant par id Google → davantage de lieux. Si TOUS les appels échouent,
+ * on relève la première erreur (visibilité côté client).
+ */
+async function searchNearbyByTypes(
+  types: string[],
+  center: { latitude: number; longitude: number },
+  radius: number,
+  key: string,
+): Promise<unknown[]> {
+  const settled = await Promise.allSettled(
+    types.map((type) =>
+      fetchJson<{ places?: RawPlaceWithId[] }>(`${PLACES_BASE}/places:searchNearby`, {
+        method: 'POST',
+        source: 'google',
+        headers: placesHeaders(key),
+        body: JSON.stringify({
+          includedTypes: [type],
+          maxResultCount: 20,
+          rankPreference: 'POPULARITY',
+          locationRestriction: { circle: { center, radius } },
+          languageCode: 'fr',
+        }),
+      }),
+    ),
+  )
+
+  const byId = new Map<string, unknown>()
+  let firstError: unknown = null
+  for (const r of settled) {
+    if (r.status === 'fulfilled') {
+      for (const p of r.value.places ?? []) {
+        if (p.id && !byId.has(p.id)) byId.set(p.id, p)
+      }
+    } else if (!firstError) {
+      firstError = r.reason
+    }
+  }
+  if (byId.size === 0 && firstError) throw firstError
+  return [...byId.values()]
 }
 
 /**
@@ -65,46 +126,30 @@ googleRouter.get('/search', async (req, res, next) => {
 
     const center = { latitude: params.lat, longitude: params.lng }
     const textQuery = params.query ?? DEFAULT_TEXT_QUERY[params.category]
-    let url: string
-    let body: Record<string, unknown>
 
     if (textQuery) {
       // Recherche texte : cuisines, « spot de pêche », etc.
-      url = `${PLACES_BASE}/places:searchText`
-      body = {
-        textQuery,
-        locationBias: { circle: { center, radius: params.radius } },
-        maxResultCount: 20,
-        languageCode: 'fr',
-      }
-    } else {
-      // Recherche à proximité par types.
-      const includedTypes = TYPES_BY_CATEGORY[params.category]
-      if (!includedTypes) {
-        return res.json({ places: [], note: `Catégorie « ${params.category} » non couverte par Google (voir OSM).` })
-      }
-      url = `${PLACES_BASE}/places:searchNearby`
-      body = {
-        includedTypes,
-        maxResultCount: 20,
-        rankPreference: 'POPULARITY',
-        locationRestriction: { circle: { center, radius: params.radius } },
-        languageCode: 'fr',
-      }
+      const data = await fetchJson<{ places?: unknown[] }>(`${PLACES_BASE}/places:searchText`, {
+        method: 'POST',
+        source: 'google',
+        headers: placesHeaders(key),
+        body: JSON.stringify({
+          textQuery,
+          locationBias: { circle: { center, radius: params.radius } },
+          maxResultCount: 20,
+          languageCode: 'fr',
+        }),
+      })
+      return res.json({ places: data.places ?? [] })
     }
 
-    const data = await fetchJson<{ places?: unknown[] }>(url, {
-      method: 'POST',
-      source: 'google',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Goog-Api-Key': key,
-        'X-Goog-FieldMask': SEARCH_FIELD_MASK,
-      },
-      body: JSON.stringify(body),
-    })
-
-    res.json({ places: data.places ?? [] })
+    // Recherche à proximité : un appel par type, fusionnés/dédupliqués.
+    const includedTypes = TYPES_BY_CATEGORY[params.category]
+    if (!includedTypes) {
+      return res.json({ places: [], note: `Catégorie « ${params.category} » non couverte par Google (voir OSM).` })
+    }
+    const places = await searchNearbyByTypes(includedTypes, center, params.radius, key)
+    res.json({ places })
   } catch (err) {
     next(err)
   }
