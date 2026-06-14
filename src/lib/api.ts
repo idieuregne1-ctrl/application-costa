@@ -64,3 +64,17 @@ export function apiUrl(path: string, params: Record<string, string | number | un
   const qs = search.toString()
   return qs ? `${path}?${qs}` : path
 }
+
+/**
+ * URL ABSOLUE vers une ressource du backend (inclut VITE_API_BASE_URL).
+ * Indispensable pour les `<img src>` (photos proxy) : contrairement à `fetch`
+ * qui passe par `apiGet`/`apiPost` (lesquels préfixent déjà BASE), une balise
+ * img utilise l'URL telle quelle — une URL relative pointerait sur le domaine du
+ * frontend, pas sur le backend.
+ */
+export function apiAssetUrl(
+  path: string,
+  params: Record<string, string | number | undefined>,
+): string {
+  return `${BASE}${apiUrl(path, params)}`
+}

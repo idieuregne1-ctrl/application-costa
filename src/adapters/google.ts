@@ -1,4 +1,4 @@
-import { apiGet, apiUrl } from '../lib/api'
+import { apiGet, apiUrl, apiAssetUrl } from '../lib/api'
 import type { Place, PlaceProvider, SearchParams } from './types'
 
 /**
@@ -39,9 +39,10 @@ function mapPriceLevel(level: string | undefined): number | null {
   }
 }
 
-/** Construit l'URL proxy d'une photo (jamais l'URL Google directe). */
+/** Construit l'URL proxy ABSOLUE d'une photo (jamais l'URL Google directe).
+ *  Absolue pour fonctionner en prod où le backend est sur un autre domaine. */
 function photoUrl(name: string, maxw = 600): string {
-  return apiUrl('/api/google/photo', { ref: name, maxw })
+  return apiAssetUrl('/api/google/photo', { ref: name, maxw })
 }
 
 function normalize(raw: RawGooglePlace, category: SearchParams['category']): Place | null {
