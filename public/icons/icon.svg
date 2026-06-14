@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" rx="112" fill="#0f172a" />
+  <!-- Étoile « crème » stylisée -->
+  <path
+    fill="#f59e0b"
+    d="M256 96l46.4 94 103.6 15-75 73.2 17.7 103.2L256 487.6l-92.7-110.2L181 274.2l-75-73.2 103.6-15z"
+  />
+  <circle cx="256" cy="262" r="58" fill="#0f172a" />
+  <circle cx="256" cy="262" r="34" fill="#fbbf24" />
+</svg>

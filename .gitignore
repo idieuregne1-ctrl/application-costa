@@ -1,0 +1,25 @@
+# Dépendances
+node_modules/
+server/node_modules/
+
+# Build
+dist/
+dist-ssr/
+server/dist/
+*.local
+
+# Secrets — JAMAIS commiter les vraies clés
+.env
+.env.*
+!.env.example
+server/.env
+server/.env.*
+!server/.env.example
+
+# Éditeurs / OS
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+*.log
+npm-debug.log*

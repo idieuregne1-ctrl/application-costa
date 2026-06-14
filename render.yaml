@@ -1,0 +1,22 @@
+# Blueprint Render pour le backend proxy (Express).
+# Sur render.com : New + → Blueprint → connecte ce repo → Render lit ce fichier.
+# Les clés (sync:false) sont à remplir dans le dashboard Render, JAMAIS dans le code.
+services:
+  - type: web
+    name: creme-backend
+    runtime: node
+    plan: free
+    rootDir: server
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      # Render injecte PORT automatiquement ; le serveur le lit via process.env.PORT.
+      - key: CORS_ORIGIN
+        sync: false # mettre l'URL Vercel du frontend (ex. https://creme.vercel.app)
+      - key: GOOGLE_PLACES_API_KEY
+        sync: false
+      - key: FOURSQUARE_API_KEY
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
