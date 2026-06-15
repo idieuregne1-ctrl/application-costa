@@ -11,6 +11,7 @@ import { geocodeRouter } from './routes/geocode.js'
 import { routeRouter } from './routes/route.js'
 import { weatherRouter } from './routes/weather.js'
 import { aiRouter } from './routes/ai.js'
+import { rentalsRouter } from './routes/rentals.js'
 
 const app = express()
 
@@ -33,6 +34,7 @@ app.use('/api/geocode', geocodeRouter)
 app.use('/api/route', routeRouter)
 app.use('/api/weather', weatherRouter)
 app.use('/api/ai', aiRouter)
+app.use('/api/rentals', rentalsRouter)
 
 // 404 pour toute route /api inconnue.
 app.use('/api', (_req, res) => {

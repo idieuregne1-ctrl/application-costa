@@ -21,6 +21,9 @@ const schema = z.object({
   FOURSQUARE_API_KEY: z.string().optional(),
   ANTHROPIC_API_KEY: z.string().optional(),
   TRIPADVISOR_API_KEY: z.string().optional(),
+  // Location de véhicules (optionnel, partenaire) :
+  AMADEUS_CLIENT_ID: z.string().optional(),
+  AMADEUS_CLIENT_SECRET: z.string().optional(),
 })
 
 const parsed = schema.safeParse(process.env)

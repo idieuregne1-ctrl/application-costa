@@ -108,7 +108,23 @@ affiche un indicateur d'état du backend en bas : vert = proxy joignable.
 10. ✅ Planificateur de journée (OSRM) + partage par lien
 11. ✅ Presets contextuels intelligents (+ indice météo)
 12. ✅ Mode hors ligne (zones téléchargées, Service Worker, bascule auto)
-13. ✅ Finitions (icônes/splash PWA, optimisations, accessibilité, ErrorBoundary)
+13. ✅ **Location de véhicules** (auto + moto) — voir ci-dessous
+14. ✅ Finitions (icônes/splash PWA, optimisations, accessibilité, ErrorBoundary)
+
+## Location de véhicules (section séparée)
+
+Accessible via le basculeur **🧭 Découverte / 🚗 Location** en haut de l'app.
+Compare auto & moto à travers plusieurs loueurs (formulaire pays/ville/dates/âge),
+trie par prix total/jour, normalise les devises (frankfurter.app, sans clé), et
+**redirige vers le loueur pour réserver** (aucun paiement dans l'app).
+
+> ⚠️ **Réalisme des sources** : il n'existe pas d'API gratuite/instantanée qui
+> compare les loueurs. Les vraies APIs (Amadeus, Rentalcars/Booking Demand)
+> exigent une **approbation partenaire**. Sans clé, l'app affiche des **liens
+> deep-link pré-remplis** (Kayak, DiscoverCars, Rentalcars / BikesBooking,
+> EagleRider) — fonctionnels, mais sans prix. Avec une clé partenaire (variables
+> `AMADEUS_*`), les offres avec prix s'affichent dans le tableau comparatif.
+> La couverture moto est marquée comme partielle.
 
 ## Tests
 
