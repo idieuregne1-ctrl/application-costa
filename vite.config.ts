@@ -11,8 +11,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['icons/icon.svg', 'icons/apple-touch-icon.png'],
       manifest: {
-        name: 'La crème de la crème',
-        short_name: 'La crème',
+        name: 'Application de voyage',
+        short_name: 'Voyage',
         description:
           'Trouve la crème de la crème autour de toi : restaurants, activités, plages, randonnée, pêche et culture locale.',
         theme_color: '#faf7f1',

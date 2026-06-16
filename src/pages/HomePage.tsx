@@ -97,7 +97,7 @@ export default function HomePage() {
       <header className="mb-5 flex items-start justify-between gap-3">
         <div>
           <h1 className="text-[28px] font-semibold leading-tight text-ink">
-            La crème de la crème
+            Application de voyage
           </h1>
           <p className="mt-1 text-sm text-stone-500">
             Le meilleur autour de vous, soigneusement sélectionné.
