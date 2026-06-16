@@ -30,13 +30,12 @@ export default function PresetChips() {
               key={preset.id}
               onClick={() => apply(preset.id)}
               className={[
-                'flex flex-shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border px-3 py-1.5 text-sm font-medium transition-colors',
+                'flex-shrink-0 whitespace-nowrap rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors',
                 active
-                  ? 'border-creme-500 bg-creme-500 text-slate-950'
-                  : 'border-slate-700 bg-slate-800/60 text-slate-200 hover:bg-slate-800',
+                  ? 'border-accent bg-accent-soft text-accent'
+                  : 'border-line bg-white text-stone-600 hover:text-ink',
               ].join(' ')}
             >
-              <span>{preset.emoji}</span>
               {preset.label}
             </button>
           )

@@ -24,11 +24,12 @@ function Section({
   if (places.length === 0) return null
   return (
     <section>
-      <div className="mb-2 flex items-baseline justify-between">
-        <h2 className="text-sm font-semibold text-slate-200">{title}</h2>
-        {hint && <span className="text-xs text-slate-500">{hint}</span>}
+      <div className="mb-3 flex items-baseline gap-3">
+        <h2 className="font-serif text-lg text-ink">{title}</h2>
+        <span className="h-px flex-1 bg-line" />
+        {hint && <span className="text-xs text-stone-400">{hint}</span>}
       </div>
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         {places.map((p) => (
           <PlaceCard key={p.id} place={p} selected={p.id === selectedId} onSelect={onSelect} />
         ))}
@@ -47,21 +48,21 @@ export default function TieredResults({ result }: { result: AggregateResult }) {
   const extra = result.all.filter((p) => !curatedIds.has(p.id))
 
   return (
-    <div className="space-y-5">
-      <Section title="🏆 Crème de la crème" hint="valeurs sûres" places={result.creme} selectedId={selectedId} onSelect={onSelect} />
-      <Section title="⭐ Excellents choix" places={result.excellents} selectedId={selectedId} onSelect={onSelect} />
-      <Section title="💎 Pépites" hint="peu connues, très bien notées" places={result.pepites} selectedId={selectedId} onSelect={onSelect} />
+    <div className="space-y-7">
+      <Section title="Crème de la crème" hint="valeurs sûres" places={result.creme} selectedId={selectedId} onSelect={onSelect} />
+      <Section title="Excellents choix" places={result.excellents} selectedId={selectedId} onSelect={onSelect} />
+      <Section title="Pépites" hint="peu connues, très bien notées" places={result.pepites} selectedId={selectedId} onSelect={onSelect} />
 
       {extra.length > 0 && (
         <div>
           <button
             onClick={() => setShowAll((v) => !v)}
-            className="w-full rounded-lg border border-slate-700 py-2 text-sm text-slate-300 hover:bg-slate-800"
+            className="w-full rounded-full border border-line py-2.5 text-sm font-medium text-stone-600 hover:bg-white hover:text-ink"
           >
             {showAll ? 'Réduire' : `Voir plus de résultats (${extra.length})`}
           </button>
           {showAll && (
-            <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
               {extra.map((p) => (
                 <PlaceCard key={p.id} place={p} selected={p.id === selectedId} onSelect={onSelect} />
               ))}

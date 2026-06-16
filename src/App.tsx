@@ -2,8 +2,14 @@ import { useEffect, useState } from 'react'
 import HomePage from './pages/HomePage'
 import RentalsPage from './pages/RentalsPage'
 import { useZones } from './store/useZones'
+import Icon, { type IconName } from './components/Icon'
 
 type Section = 'discovery' | 'rentals'
+
+const TABS: { key: Section; label: string; icon: IconName }[] = [
+  { key: 'discovery', label: 'Découverte', icon: 'compass' },
+  { key: 'rentals', label: 'Location', icon: 'car' },
+]
 
 export default function App() {
   const [section, setSection] = useState<Section>('discovery')
@@ -16,25 +22,24 @@ export default function App() {
   return (
     <div className="flex min-h-full flex-col">
       {/* Basculeur de section */}
-      <nav className="flex justify-center gap-1 border-b border-slate-800 bg-slate-950/80 p-2 backdrop-blur">
-        {(
-          [
-            { key: 'discovery', label: '🧭 Découverte' },
-            { key: 'rentals', label: '🚗 Location' },
-          ] as const
-        ).map((s) => (
-          <button
-            key={s.key}
-            onClick={() => setSection(s.key)}
-            aria-pressed={section === s.key}
-            className={[
-              'rounded-full px-4 py-1.5 text-sm font-medium transition-colors',
-              section === s.key ? 'bg-creme-500 text-slate-950' : 'text-slate-300 hover:bg-slate-800',
-            ].join(' ')}
-          >
-            {s.label}
-          </button>
-        ))}
+      <nav className="flex justify-center gap-8 border-b border-line bg-paper/95 py-3">
+        {TABS.map((t) => {
+          const active = section === t.key
+          return (
+            <button
+              key={t.key}
+              onClick={() => setSection(t.key)}
+              aria-pressed={active}
+              className={[
+                'flex items-center gap-2 border-b-2 pb-1 text-sm font-medium transition-colors',
+                active ? 'border-accent text-ink' : 'border-transparent text-stone-400 hover:text-ink',
+              ].join(' ')}
+            >
+              <Icon name={t.icon} size={16} />
+              {t.label}
+            </button>
+          )
+        })}
       </nav>
 
       <div className="flex-1">{section === 'discovery' ? <HomePage /> : <RentalsPage />}</div>

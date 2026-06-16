@@ -10,33 +10,31 @@ export const SOURCE_LABEL: Record<PlaceSource, string> = {
   tripadvisor: 'TripAdvisor',
 }
 
-export const TIER_BADGE: Record<Tier, { emoji: string; label: string; cls: string; ring: string }> = {
+export const TIER_BADGE: Record<Tier, { label: string; short: string; cls: string }> = {
   creme: {
-    emoji: '🏆',
     label: 'Crème de la crème',
-    cls: 'bg-creme-500/20 text-creme-300',
-    ring: 'ring-creme-500',
+    short: 'Crème de la crème',
+    // Pastille claire sur la photo : fond ivoire, texte or.
+    cls: 'bg-white/90 text-accent',
   },
   excellent: {
-    emoji: '⭐',
     label: 'Excellent choix',
-    cls: 'bg-sky-500/20 text-sky-200',
-    ring: 'ring-sky-500',
+    short: 'Excellent',
+    cls: 'bg-white/90 text-ink',
   },
   pepite: {
-    emoji: '💎',
     label: 'Pépite',
-    cls: 'bg-violet-500/20 text-violet-200',
-    ring: 'ring-violet-500',
+    short: 'Pépite',
+    cls: 'bg-white/90 text-stone-600',
   },
 }
 
-/** Couleur de pin de carte par palier (et défaut). */
+/** Couleur de pin de carte par palier (et défaut) — tons sobres. */
 export const TIER_COLOR: Record<Tier | 'default', string> = {
-  creme: '#f59e0b',
-  excellent: '#38bdf8',
-  pepite: '#a78bfa',
-  default: '#94a3b8',
+  creme: '#a6772e',
+  excellent: '#44403c',
+  pepite: '#8a7a64',
+  default: '#a8a29e',
 }
 
 export function formatDistance(m: number | null): string {

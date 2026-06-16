@@ -1,6 +1,7 @@
 import { useNetworkStatus } from '../hooks/useNetworkStatus'
 import { useAppStore } from '../store/useAppStore'
 import { useZones } from '../store/useZones'
+import Icon from './Icon'
 
 /**
  * Bannière affichée quand le réseau est coupé. Indique la date des données
@@ -26,11 +27,11 @@ export default function OfflineBanner() {
     : null
 
   return (
-    <div className="mb-3 flex items-center gap-2 rounded-xl border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-sm text-amber-200">
-      <span>📴</span>
+    <div className="mb-3 flex items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+      <Icon name="wifi-off" size={16} className="flex-shrink-0" />
       <span>
         Mode hors ligne
-        {dateLabel ? ` — données du ${dateLabel}` : " — télécharge une zone quand tu es connecté"}
+        {dateLabel ? ` — données du ${dateLabel}` : ' — téléchargez une zone quand vous êtes connecté'}
       </span>
     </div>
   )

@@ -1,5 +1,6 @@
 import type { MergedPlace } from '../core'
 import { useFavorites } from '../store/useFavorites'
+import Icon from './Icon'
 
 /**
  * Bouton cœur pour ajouter/retirer un lieu des favoris.
@@ -25,9 +26,9 @@ export default function FavoriteButton({
       }}
       aria-label={isFav ? 'Retirer des favoris' : 'Ajouter aux favoris'}
       aria-pressed={isFav}
-      className={`flex h-8 w-8 items-center justify-center rounded-full bg-black/50 text-base backdrop-blur transition-transform hover:scale-110 ${className}`}
+      className={`flex h-9 w-9 items-center justify-center rounded-full bg-white/90 shadow-sm transition-transform hover:scale-110 ${isFav ? 'text-red-600' : 'text-stone-500'} ${className}`}
     >
-      {isFav ? '❤️' : '🤍'}
+      <Icon name="heart" size={18} className={isFav ? 'fill-current' : ''} />
     </button>
   )
 }

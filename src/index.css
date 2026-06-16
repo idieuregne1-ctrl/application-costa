@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 html,
@@ -13,8 +13,16 @@ body,
 }
 
 body {
-  @apply bg-slate-950 text-slate-100 antialiased;
+  @apply bg-paper text-ink antialiased;
   /* Respecte les encoches / safe-areas sur mobile (viewport-fit=cover). */
   padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom)
     env(safe-area-inset-left);
+}
+
+/* Titres éditoriaux en serif. */
+h1,
+h2,
+.font-display {
+  @apply font-serif;
+  letter-spacing: -0.01em;
 }

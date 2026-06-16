@@ -18,34 +18,56 @@ import WeatherHint from '../components/WeatherHint'
 import { isOutdoor } from '../components/WeatherCard'
 import OfflineBanner from '../components/OfflineBanner'
 import DownloadedZonesSheet from '../components/DownloadedZonesSheet'
+import Icon, { type IconName } from '../components/Icon'
 import { useZones } from '../store/useZones'
 import { useFavorites } from '../store/useFavorites'
 import { usePlanner } from '../store/usePlanner'
 import { decodePlan } from '../lib/planner'
 import type { MergedPlace } from '../core'
 
-/**
- * Plan partagé capturé UNE fois au chargement du module (avant le montage React
- * et l'hydratation du store). Évite que le double-montage de StrictMode ou
- * l'hydratation asynchrone ne fasse perdre l'import.
- */
 const SHARED_PLAN = (() => {
   const hash = window.location.hash
   if (!hash.startsWith('#plan=')) return null
   const decoded = decodePlan(hash.slice('#plan='.length))
-  // Nettoie le fragment pour ne pas réimporter au refresh.
   window.history.replaceState(null, '', window.location.pathname + window.location.search)
   return decoded && decoded.length > 0 ? decoded : null
 })()
 
-const CATEGORIES: { key: PlaceCategory; label: string; emoji: string }[] = [
-  { key: 'restaurant', label: 'Restaurants', emoji: '🍽️' },
-  { key: 'activity', label: 'Activités', emoji: '🎟️' },
-  { key: 'beach', label: 'Plages', emoji: '🏖️' },
-  { key: 'hike', label: 'Randonnée', emoji: '🥾' },
-  { key: 'fishing', label: 'Pêche', emoji: '🎣' },
-  { key: 'culture', label: 'Culture locale', emoji: '🏛️' },
+const CATEGORIES: { key: PlaceCategory; label: string }[] = [
+  { key: 'restaurant', label: 'Restaurants' },
+  { key: 'activity', label: 'Activités' },
+  { key: 'beach', label: 'Plages' },
+  { key: 'hike', label: 'Randonnée' },
+  { key: 'fishing', label: 'Pêche' },
+  { key: 'culture', label: 'Culture locale' },
 ]
+
+function IconButton({
+  icon,
+  label,
+  badge,
+  onClick,
+}: {
+  icon: IconName
+  label: string
+  badge?: number
+  onClick: () => void
+}) {
+  return (
+    <button
+      onClick={onClick}
+      aria-label={label}
+      className="relative flex h-10 w-10 items-center justify-center rounded-full border border-line text-ink transition-colors hover:bg-white"
+    >
+      <Icon name={icon} size={19} />
+      {badge !== undefined && badge > 0 && (
+        <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-accent px-1 text-[11px] font-semibold text-white">
+          {badge}
+        </span>
+      )}
+    </button>
+  )
+}
 
 export default function HomePage() {
   const activeCategory = useAppStore((s) => s.activeCategory)
@@ -60,8 +82,6 @@ export default function HomePage() {
   const [plannerOpen, setPlannerOpen] = useState(false)
   const [zonesOpen, setZonesOpen] = useState(false)
 
-  // Lien partagé : ouvre le planificateur et applique l'itinéraire APRÈS
-  // l'hydratation IndexedDB (sinon l'état persisté écraserait le plan partagé).
   useEffect(() => {
     if (!SHARED_PLAN) return
     setPlannerOpen(true)
@@ -74,47 +94,19 @@ export default function HomePage() {
 
   return (
     <div className="mx-auto flex min-h-full max-w-2xl flex-col px-4 py-6">
-      <header className="mb-4 flex items-start justify-between gap-2">
+      <header className="mb-5 flex items-start justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">
-            La <span className="text-creme-400">crème de la crème</span>
+          <h1 className="text-[28px] font-semibold leading-tight text-ink">
+            La crème de la crème
           </h1>
-          <p className="mt-1 text-sm text-slate-400">
-            Le meilleur autour de toi — agrégé, scoré, sans le bruit.
+          <p className="mt-1 text-sm text-stone-500">
+            Le meilleur autour de vous, soigneusement sélectionné.
           </p>
         </div>
         <div className="flex flex-shrink-0 items-center gap-2">
-          <button
-            onClick={() => setZonesOpen(true)}
-            aria-label="Zones téléchargées"
-            className="relative flex h-10 w-10 items-center justify-center rounded-full border border-slate-700 text-lg hover:bg-slate-800"
-          >
-            📥
-            {zoneCount > 0 && (
-              <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-creme-500 px-1 text-xs font-semibold text-slate-950">
-                {zoneCount}
-              </span>
-            )}
-          </button>
-          <button
-            onClick={() => setPlannerOpen(true)}
-            aria-label="Planificateur de journée"
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-700 text-lg hover:bg-slate-800"
-          >
-            🗓️
-          </button>
-          <button
-            onClick={() => setFavoritesOpen(true)}
-            aria-label="Mes favoris"
-            className="relative flex h-10 w-10 items-center justify-center rounded-full border border-slate-700 text-lg hover:bg-slate-800"
-          >
-            ❤️
-            {favCount > 0 && (
-              <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-creme-500 px-1 text-xs font-semibold text-slate-950">
-                {favCount}
-              </span>
-            )}
-          </button>
+          <IconButton icon="download" label="Zones téléchargées" badge={zoneCount} onClick={() => setZonesOpen(true)} />
+          <IconButton icon="calendar" label="Planificateur de journée" onClick={() => setPlannerOpen(true)} />
+          <IconButton icon="heart" label="Mes favoris" badge={favCount} onClick={() => setFavoritesOpen(true)} />
         </div>
       </header>
 
@@ -124,52 +116,49 @@ export default function HomePage() {
         <LocationBar />
       </div>
 
-      {/* Raccourcis contextuels */}
-      <div className="mb-3">
+      <div className="mb-4">
         <PresetChips />
       </div>
 
-      {/* Onglets de catégorie */}
-      <nav className="-mx-1 mb-4 flex flex-wrap gap-2">
-        {CATEGORIES.map((cat) => {
-          const active = cat.key === activeCategory
-          return (
-            <button
-              key={cat.key}
-              onClick={() => setActiveCategory(cat.key)}
-              aria-pressed={active}
-              className={[
-                'rounded-full px-3 py-1.5 text-sm font-medium transition-colors',
-                active
-                  ? 'bg-creme-500 text-slate-950'
-                  : 'bg-slate-800 text-slate-300 hover:bg-slate-700',
-              ].join(' ')}
-            >
-              <span className="mr-1">{cat.emoji}</span>
-              {cat.label}
-            </button>
-          )
-        })}
+      {/* Onglets de catégorie — sous forme d'onglets soulignés */}
+      <nav className="-mx-4 mb-5 overflow-x-auto px-4">
+        <div className="flex min-w-max gap-6 border-b border-line">
+          {CATEGORIES.map((cat) => {
+            const active = cat.key === activeCategory
+            return (
+              <button
+                key={cat.key}
+                onClick={() => setActiveCategory(cat.key)}
+                aria-pressed={active}
+                className={[
+                  '-mb-px whitespace-nowrap border-b-2 pb-2.5 text-sm font-medium transition-colors',
+                  active ? 'border-accent text-ink' : 'border-transparent text-stone-400 hover:text-ink',
+                ].join(' ')}
+              >
+                {cat.label}
+              </button>
+            )
+          })}
+        </div>
       </nav>
 
       {/* Barre de filtres */}
       {position !== null && (
-        <div className="mb-4 space-y-2">
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setFiltersOpen(true)}
-              className="flex items-center gap-2 rounded-lg border border-slate-700 px-3 py-2 text-sm font-medium text-slate-200 hover:bg-slate-800"
-            >
-              <span>⚙️ Filtres</span>
-              {filterCount > 0 && (
-                <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-creme-500 px-1.5 text-xs font-semibold text-slate-950">
-                  {filterCount}
-                </span>
-              )}
-            </button>
-            <div className="min-w-0 flex-1">
-              <FilterChips />
-            </div>
+        <div className="mb-4 flex items-center gap-2">
+          <button
+            onClick={() => setFiltersOpen(true)}
+            className="flex flex-shrink-0 items-center gap-2 rounded-full border border-line px-3.5 py-2 text-sm font-medium text-ink transition-colors hover:bg-white"
+          >
+            <Icon name="sliders" size={16} />
+            Filtres
+            {filterCount > 0 && (
+              <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-accent px-1.5 text-[11px] font-semibold text-white">
+                {filterCount}
+              </span>
+            )}
+          </button>
+          <div className="min-w-0 flex-1">
+            <FilterChips />
           </div>
         </div>
       )}
@@ -177,9 +166,9 @@ export default function HomePage() {
       <main className="flex-1">
         {position === null ? (
           <EmptyState
-            icon="🧭"
-            title="Choisis un point de départ"
-            text="Active ta position ou cherche une ville pour voir la crème de la crème autour."
+            icon="pin"
+            title="Choisissez un point de départ"
+            text="Activez votre position ou cherchez une ville pour découvrir le meilleur autour."
           />
         ) : (
           <Results category={activeCategory} />
@@ -198,20 +187,14 @@ function Results({ category }: { category: PlaceCategory }) {
   const { results, isLoading, isError, error, refetch, sortBy } = usePlaceResults(category)
 
   if (!isCategoryImplemented(category)) {
-    return (
-      <EmptyState
-        icon="🚧"
-        title="Bientôt disponible"
-        text="Cette catégorie sera branchée en Phase 6 (plein air & culture)."
-      />
-    )
+    return <EmptyState icon="compass" title="Bientôt disponible" text="Cette catégorie arrive prochainement." />
   }
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="h-52 animate-pulse rounded-2xl bg-slate-900/60" />
+          <div key={i} className="h-56 animate-pulse rounded-xl bg-stone-200/60" />
         ))}
       </div>
     )
@@ -220,7 +203,7 @@ function Results({ category }: { category: PlaceCategory }) {
   if (isError) {
     return (
       <EmptyState
-        icon="⚠️"
+        icon="wifi-off"
         title="Échec du chargement"
         text={error instanceof Error ? error.message : 'Erreur inconnue.'}
         action={{ label: 'Réessayer', onClick: () => refetch() }}
@@ -231,9 +214,9 @@ function Results({ category }: { category: PlaceCategory }) {
   if (!results || results.filtered.length === 0) {
     return (
       <EmptyState
-        icon="🔍"
+        icon="search"
         title="Aucun résultat"
-        text="Rien ne correspond ici. Élargis le rayon, assouplis les filtres, ou change de zone."
+        text="Rien ne correspond ici. Élargissez le rayon, assouplissez les filtres, ou changez de zone."
       />
     )
   }
@@ -264,7 +247,6 @@ function ResultsBody({
 
   const onSelect = (p: MergedPlace) => openDetail(p.id)
   const mapPlaces = sortBy === 'quality' ? results.tiers.all : results.flat
-  // Vivier « Surprends-moi » : la sélection curée (top picks de la catégorie).
   const surprisePool = results.tiers.curated
 
   const download = async () => {
@@ -279,35 +261,30 @@ function ResultsBody({
     setTimeout(() => setDownloaded(false), 2500)
   }
 
+  const toolBtn = 'flex items-center gap-1.5 rounded-full border border-line px-3 py-1.5 font-medium text-ink transition-colors hover:bg-white'
+
   return (
-    <div className="space-y-3">
-      <div className="flex items-center justify-between gap-2 text-xs text-slate-500">
+    <div className="space-y-4">
+      <div className="flex items-center justify-between gap-2 text-xs text-stone-500">
         <span>
-          {results.filtered.length} lieu(x) sur {results.rawCount} bruts
+          {results.filtered.length} lieux sur {results.rawCount}
         </span>
         <div className="flex items-center gap-2">
-          <button
-            onClick={download}
-            className="rounded-lg border border-slate-700 px-2 py-1.5 font-medium text-slate-200 hover:bg-slate-800"
-          >
-            {downloaded ? '✓ Téléchargé' : '⬇️ Télécharger'}
+          <button onClick={download} className={toolBtn}>
+            <Icon name={downloaded ? 'check' : 'download'} size={15} />
+            <span className="hidden sm:inline">{downloaded ? 'Téléchargé' : 'Télécharger'}</span>
           </button>
-          <button
-            onClick={() => setSurpriseOpen(true)}
-            className="rounded-lg border border-slate-700 px-2 py-1.5 font-medium text-slate-200 hover:bg-slate-800"
-          >
-            🎲 Surprends-moi
+          <button onClick={() => setSurpriseOpen(true)} className={toolBtn}>
+            <Icon name="dice" size={15} />
+            <span className="hidden sm:inline">Surprends-moi</span>
           </button>
           <ViewToggle mode={viewMode} onChange={setViewMode} />
         </div>
       </div>
       {results.failedSources.length > 0 && (
-        <p className="text-xs text-amber-400">
-          Source(s) en échec : {results.failedSources.join(', ')}
-        </p>
+        <p className="text-xs text-amber-700">Source(s) en échec : {results.failedSources.join(', ')}</p>
       )}
 
-      {/* Indice météo du jour pour les catégories plein air */}
       {isOutdoor(category) && <WeatherHint position={position} category={category} />}
 
       {viewMode === 'map' ? (
@@ -315,7 +292,7 @@ function ResultsBody({
       ) : sortBy === 'quality' ? (
         <TieredResults result={results.tiers} />
       ) : (
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           {results.flat.map((p) => (
             <PlaceCard key={p.id} place={p} selected={p.id === selectedId} onSelect={onSelect} />
           ))}
@@ -330,18 +307,19 @@ function ResultsBody({
 
 function ViewToggle({ mode, onChange }: { mode: 'list' | 'map'; onChange: (m: 'list' | 'map') => void }) {
   return (
-    <div className="flex overflow-hidden rounded-lg border border-slate-700 text-xs">
+    <div className="flex overflow-hidden rounded-full border border-line">
       {(['list', 'map'] as const).map((m) => (
         <button
           key={m}
           onClick={() => onChange(m)}
           aria-pressed={mode === m}
+          aria-label={m === 'list' ? 'Vue liste' : 'Vue carte'}
           className={[
-            'px-3 py-1.5 font-medium transition-colors',
-            mode === m ? 'bg-creme-500 text-slate-950' : 'bg-slate-900 text-slate-300 hover:bg-slate-800',
+            'flex items-center justify-center px-3 py-1.5 transition-colors',
+            mode === m ? 'bg-accent text-white' : 'bg-white text-stone-500 hover:text-ink',
           ].join(' ')}
         >
-          {m === 'list' ? '☰ Liste' : '🗺️ Carte'}
+          <Icon name={m === 'list' ? 'list' : 'map'} size={15} />
         </button>
       ))}
     </div>
@@ -354,20 +332,22 @@ function EmptyState({
   text,
   action,
 }: {
-  icon: string
+  icon: IconName
   title: string
   text: string
   action?: { label: string; onClick: () => void }
 }) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-700 p-10 text-center">
-      <span className="text-3xl">{icon}</span>
-      <p className="mt-2 font-medium text-slate-200">{title}</p>
-      <p className="mt-1 max-w-sm text-sm text-slate-500">{text}</p>
+    <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-line p-12 text-center">
+      <span className="flex h-12 w-12 items-center justify-center rounded-full bg-accent-soft text-accent">
+        <Icon name={icon} size={22} />
+      </span>
+      <p className="mt-3 font-serif text-lg text-ink">{title}</p>
+      <p className="mt-1 max-w-sm text-sm text-stone-500">{text}</p>
       {action && (
         <button
           onClick={action.onClick}
-          className="mt-4 rounded-lg bg-creme-500 px-4 py-1.5 text-sm font-medium text-slate-950 hover:bg-creme-400"
+          className="mt-4 rounded-full bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent-dark"
         >
           {action.label}
         </button>

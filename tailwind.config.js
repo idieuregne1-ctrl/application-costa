@@ -11,17 +11,23 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Palette de l'app — fond sombre ardoise, accent ambre "crème".
-        creme: {
-          50: '#fffbeb',
-          100: '#fef3c7',
-          400: '#fbbf24',
-          500: '#f59e0b',
-          600: '#d97706',
+        // Palette éditoriale claire « guide de voyage » — papier chaud + or sobre.
+        paper: '#faf7f1', // fond, ivoire chaud
+        ink: '#211d1a', // titres, presque-noir chaud
+        line: '#e9e3d9', // bordures fines
+        accent: {
+          DEFAULT: '#a6772e', // or/ocre sobre
+          dark: '#7f5a20',
+          soft: '#f1e7d4', // fond accent discret
         },
       },
       fontFamily: {
+        // UI/corps : police système (nette, native). Titres : serif éditoriale.
         sans: ['system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
+        serif: ['Fraunces', 'Georgia', 'Cambria', 'Times New Roman', 'serif'],
+      },
+      boxShadow: {
+        card: '0 1px 2px rgba(33,29,26,0.04), 0 1px 8px rgba(33,29,26,0.04)',
       },
     },
   },

@@ -23,19 +23,19 @@ export default function WeatherHint({
   const { emoji, label } = describeWeather(today.weatherCode)
   const rainy = (today.precipProbabilityMax ?? 0) >= 50
   const sentiment = rainy
-    ? { text: 'Risque de pluie aujourd’hui', cls: 'text-amber-300' }
-    : { text: 'Bonne journée pour sortir', cls: 'text-emerald-300' }
+    ? { text: 'Risque de pluie aujourd’hui', cls: 'text-amber-700' }
+    : { text: 'Bonne journée pour sortir', cls: 'text-emerald-700' }
 
   return (
-    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-xl border border-slate-800 bg-slate-800/30 px-3 py-2 text-xs">
+    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-xl border border-line bg-white px-3 py-2 text-xs">
       <span className="text-base">{emoji}</span>
-      <span className="font-medium text-slate-200">
+      <span className="font-medium text-ink">
         {Math.round(today.tempMax)}° / {Math.round(today.tempMin)}°
       </span>
-      <span className="text-slate-400">{label}</span>
+      <span className="text-stone-500">{label}</span>
       <span className={sentiment.cls}>· {sentiment.text}</span>
-      <span className="ml-auto text-slate-500">
-        🌅 {timeOf(today.sunrise)} · 🌇 {timeOf(today.sunset)}
+      <span className="ml-auto text-stone-400">
+        Lever {timeOf(today.sunrise)} · Coucher {timeOf(today.sunset)}
       </span>
     </div>
   )

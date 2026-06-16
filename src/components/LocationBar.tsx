@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useGeolocation } from '../hooks/useGeolocation'
 import { useGeocode } from '../hooks/useGeocode'
 import { useAppStore } from '../store/useAppStore'
+import Icon from './Icon'
 
 /**
  * Barre de localisation : bouton « Ma position » (géoloc) + recherche manuelle
@@ -26,25 +27,27 @@ export default function LocationBar() {
         <button
           onClick={locate}
           disabled={geoStatus === 'loading'}
-          className="flex items-center gap-1.5 whitespace-nowrap rounded-lg bg-creme-500 px-3 py-2 text-sm font-medium text-slate-950 transition-colors hover:bg-creme-400 disabled:opacity-60"
+          className="flex items-center gap-1.5 whitespace-nowrap rounded-lg bg-accent px-3.5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-accent-dark disabled:opacity-60"
         >
-          📍 {geoStatus === 'loading' ? 'Localisation…' : 'Ma position'}
+          <Icon name="pin" size={16} />
+          {geoStatus === 'loading' ? 'Localisation…' : 'Ma position'}
         </button>
         <form onSubmit={onSubmit} className="relative flex-1">
+          <Icon name="search" size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-stone-400" />
           <input
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Chercher une ville, une adresse…"
-            className="w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-creme-500 focus:outline-none"
+            className="w-full rounded-lg border border-line bg-white py-2.5 pl-9 pr-3 text-sm text-ink placeholder:text-stone-400 focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
           />
         </form>
       </div>
 
       {/* Candidats de géocodage */}
       {(loading || results.length > 0 || geoCodeError) && (
-        <div className="rounded-lg border border-slate-700 bg-slate-900 text-sm">
-          {loading && <p className="px-3 py-2 text-slate-400">Recherche…</p>}
-          {geoCodeError && <p className="px-3 py-2 text-amber-400">{geoCodeError}</p>}
+        <div className="overflow-hidden rounded-lg border border-line bg-white text-sm shadow-card">
+          {loading && <p className="px-3 py-2 text-stone-500">Recherche…</p>}
+          {geoCodeError && <p className="px-3 py-2 text-amber-700">{geoCodeError}</p>}
           {results.map((r) => (
             <button
               key={`${r.lat},${r.lng}`}
@@ -54,7 +57,7 @@ export default function LocationBar() {
                 clear()
                 setInput(r.name.split(',')[0])
               }}
-              className="block w-full truncate px-3 py-2 text-left text-slate-300 hover:bg-slate-800"
+              className="block w-full truncate border-b border-line px-3 py-2.5 text-left text-stone-700 last:border-0 hover:bg-stone-50"
             >
               {r.name}
             </button>
@@ -62,11 +65,11 @@ export default function LocationBar() {
         </div>
       )}
 
-      {geoError && <p className="text-xs text-amber-400">{geoError}</p>}
+      {geoError && <p className="text-xs text-amber-700">{geoError}</p>}
 
       {position && (
-        <p className="text-xs text-slate-500">
-          Position : {position.lat.toFixed(4)}, {position.lng.toFixed(4)}
+        <p className="text-xs text-stone-400">
+          {position.lat.toFixed(4)}, {position.lng.toFixed(4)}
         </p>
       )}
     </div>

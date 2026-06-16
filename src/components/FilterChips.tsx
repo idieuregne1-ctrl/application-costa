@@ -16,12 +16,12 @@ const SORT_LABEL: Record<SortBy, string> = {
 
 function Chip({ label, onRemove }: { label: string; onRemove: () => void }) {
   return (
-    <span className="inline-flex items-center gap-1 rounded-full bg-slate-800 py-1 pl-3 pr-1 text-xs text-slate-200">
+    <span className="inline-flex items-center gap-1 rounded-full border border-line bg-white py-1 pl-3 pr-1.5 text-xs text-stone-600">
       {label}
       <button
         onClick={onRemove}
         aria-label={`Retirer ${label}`}
-        className="flex h-4 w-4 items-center justify-center rounded-full text-slate-400 hover:bg-slate-700 hover:text-white"
+        className="flex h-4 w-4 items-center justify-center rounded-full text-stone-400 hover:bg-stone-100 hover:text-ink"
       >
         ×
       </button>

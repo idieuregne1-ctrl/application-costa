@@ -15,8 +15,8 @@ export default defineConfig({
         short_name: 'La crème',
         description:
           'Trouve la crème de la crème autour de toi : restaurants, activités, plages, randonnée, pêche et culture locale.',
-        theme_color: '#0f172a',
-        background_color: '#0f172a',
+        theme_color: '#faf7f1',
+        background_color: '#faf7f1',
         display: 'standalone',
         start_url: '/',
         scope: '/',
@@ -36,6 +36,16 @@ export default defineConfig({
         // ligne, repli sur le cache hors ligne). Expiration à quelques jours pour
         // rester conforme aux conditions des sources.
         runtimeCaching: [
+          {
+            // Polices Google (affichage serif) — cache long.
+            urlPattern: /fonts\.(googleapis|gstatic)\.com/,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'google-fonts',
+              expiration: { maxEntries: 20, maxAgeSeconds: 60 * 60 * 24 * 365 },
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
           {
             urlPattern: /tile\.openstreetmap\.org/,
             handler: 'CacheFirst',
