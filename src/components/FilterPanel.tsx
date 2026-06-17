@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useAppStore } from '../store/useAppStore'
 import { DEFAULT_FILTERS, SUBTYPE_OPTIONS, type Filters, type SortBy } from '../core'
 import type { PlaceSource, TrailDifficulty } from '../adapters'
+import { useI18n } from '../lib/i18n'
 
 /**
  * Panneau de filtres : drawer (mobile, glisse depuis la droite) / sidebar (desktop).
@@ -45,6 +46,7 @@ interface FilterPanelProps {
 }
 
 export default function FilterPanel({ open, onClose }: FilterPanelProps) {
+ const { t } = useI18n()
  const filters = useAppStore((s) => s.filters)
  const setFilters = useAppStore((s) => s.setFilters)
  const activeSources = useAppStore((s) => s.activeSources)
@@ -113,10 +115,10 @@ export default function FilterPanel({ open, onClose }: FilterPanelProps) {
  className="relative flex h-full w-full max-w-sm flex-col bg-paper shadow-2xl"
  >
  <header className="flex items-center justify-between border-b border-line p-4">
- <h2 className="text-lg font-semibold text-ink">Filtres</h2>
+ <h2 className="font-serif text-lg text-ink">{t('Filtres')}</h2>
  <button
  onClick={onClose}
- aria-label="Fermer"
+ aria-label={t('Fermer')}
  className="flex h-8 w-8 items-center justify-center rounded-full text-stone-500 hover:bg-stone-100"
  >
  ✕
@@ -125,7 +127,7 @@ export default function FilterPanel({ open, onClose }: FilterPanelProps) {
 
  <div className="flex-1 space-y-6 overflow-y-auto p-4">
  {/* Rayon */}
- <Group label={`Rayon : ${km} km`}>
+ <Group label={`${t('Rayon')} : ${km} km`}>
  <input
  type="range"
  min={500}
@@ -143,7 +145,7 @@ export default function FilterPanel({ open, onClose }: FilterPanelProps) {
 
  {/* Filtres par sous-type (selon la catégorie) */}
  {subtypeOptions && (
- <Group label="Type">
+ <Group label={t('Type')}>
  <div className="grid grid-cols-2 gap-2">
  {subtypeOptions.map((opt) => (
  <Toggle
@@ -151,7 +153,7 @@ export default function FilterPanel({ open, onClose }: FilterPanelProps) {
  active={draft.subtypes.includes(opt.value)}
  onClick={() => toggleInArray('subtypes', opt.value)}
  >
- {opt.label}
+ {t(opt.label)}
  </Toggle>
  ))}
  </div>
@@ -160,7 +162,7 @@ export default function FilterPanel({ open, onClose }: FilterPanelProps) {
 
  {/* Difficulté (randonnée) */}
  {showDifficulty && (
- <Group label="Difficulté">
+ <Group label={t('Difficulté')}>
  <div className="flex gap-2">
  {DIFFICULTY_OPTIONS.map((opt) => (
  <Toggle
@@ -168,7 +170,7 @@ export default function FilterPanel({ open, onClose }: FilterPanelProps) {
  active={draft.difficulties.includes(opt.value)}
  onClick={() => toggleInArray('difficulties', opt.value)}
  >
- {opt.label}
+ {t(opt.label)}
  </Toggle>
  ))}
  </div>
@@ -177,7 +179,7 @@ export default function FilterPanel({ open, onClose }: FilterPanelProps) {
 
  {/* Prix (restaurants / activités) */}
  {showPrice && (
- <Group label="Prix">
+ <Group label={t('Prix')}>
  <div className="flex gap-2">
  {[1, 2, 3, 4].map((level) => (
  <Toggle
@@ -193,7 +195,7 @@ export default function FilterPanel({ open, onClose }: FilterPanelProps) {
  )}
 
  {/* Note minimale */}
- <Group label="Note minimale">
+ <Group label={t('Note minimale')}>
  <div className="flex gap-2">
  {RATING_OPTIONS.map((opt) => (
  <Toggle
@@ -201,7 +203,7 @@ export default function FilterPanel({ open, onClose }: FilterPanelProps) {
  active={draft.minRating === opt.value}
  onClick={() => setDraft((d) => ({ ...d, minRating: opt.value }))}
  >
- {opt.label}
+ {t(opt.label)}
  </Toggle>
  ))}
  </div>
@@ -210,7 +212,7 @@ export default function FilterPanel({ open, onClose }: FilterPanelProps) {
  {/* Ouvert maintenant */}
  <Group label="">
  <label className="flex cursor-pointer items-center justify-between">
- <span className="text-sm text-ink">Ouvert maintenant</span>
+ <span className="text-sm text-ink">{t('Ouvert maintenant')}</span>
  <Switch
  checked={draft.openNow}
  onChange={(v) => setDraft((d) => ({ ...d, openNow: v }))}
@@ -219,7 +221,7 @@ export default function FilterPanel({ open, onClose }: FilterPanelProps) {
  </Group>
 
  {/* Tri */}
- <Group label="Trier par">
+ <Group label={t('Trier par')}>
  <div className="grid grid-cols-2 gap-2">
  {SORT_OPTIONS.map((opt) => (
  <Toggle
@@ -227,14 +229,14 @@ export default function FilterPanel({ open, onClose }: FilterPanelProps) {
  active={draft.sortBy === opt.value}
  onClick={() => setDraft((d) => ({ ...d, sortBy: opt.value }))}
  >
- {opt.label}
+ {t(opt.label)}
  </Toggle>
  ))}
  </div>
  </Group>
 
  {/* Sources actives */}
- <Group label="Sources actives">
+ <Group label={t('Sources actives')}>
  <div className="space-y-2">
  {SOURCE_OPTIONS.map((src) => (
  <label key={src.value} className="flex cursor-pointer items-center justify-between">
@@ -249,7 +251,7 @@ export default function FilterPanel({ open, onClose }: FilterPanelProps) {
  </label>
  ))}
  </div>
- <p className="mt-1 text-[11px] text-stone-400">Catégorie active : {activeCategory}</p>
+ <p className="mt-1 text-[11px] text-stone-400">{t('Catégorie active')} : {activeCategory}</p>
  </Group>
  </div>
 
@@ -258,13 +260,13 @@ export default function FilterPanel({ open, onClose }: FilterPanelProps) {
  onClick={reset}
  className="flex-1 rounded-xl border border-line py-3 text-sm font-medium text-stone-600 hover:bg-stone-100"
  >
- Réinitialiser
+ {t('Réinitialiser')}
  </button>
  <button
  onClick={apply}
  className="flex-[2] rounded-xl bg-accent py-3 text-sm font-semibold text-white hover:bg-accent-dark"
  >
- Appliquer
+ {t('Appliquer')}
  </button>
  </footer>
  </aside>

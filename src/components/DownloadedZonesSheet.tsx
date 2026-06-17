@@ -3,6 +3,7 @@ import { useZones, isZoneExpired, type ZoneMeta } from '../store/useZones'
 import { providersFor } from '../adapters'
 import { aggregate } from '../core'
 import { useNetworkStatus } from '../hooks/useNetworkStatus'
+import { useI18n } from '../lib/i18n'
 
 /**
  * Section « Mes zones téléchargées » : liste les zones sauvegardées (date, taille,
@@ -18,6 +19,7 @@ function formatBytes(n: number): string {
 }
 
 export default function DownloadedZonesSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
+ const { t } = useI18n()
  const index = useZones((s) => s.index)
  const remove = useZones((s) => s.remove)
  const download = useZones((s) => s.download)
@@ -53,10 +55,10 @@ export default function DownloadedZonesSheet({ open, onClose }: { open: boolean;
  className="relative flex h-full w-full max-w-md flex-col bg-paper shadow-2xl"
  >
  <header className="flex items-center justify-between border-b border-line p-4">
- <h2 className="text-lg font-semibold text-ink">Mes zones téléchargées</h2>
+ <h2 className="font-serif text-lg text-ink">{t('Mes zones téléchargées')}</h2>
  <button
  onClick={onClose}
- aria-label="Fermer"
+ aria-label={t('Fermer')}
  className="flex h-8 w-8 items-center justify-center rounded-full text-stone-500 hover:bg-stone-100"
  >
  ✕
@@ -66,10 +68,9 @@ export default function DownloadedZonesSheet({ open, onClose }: { open: boolean;
  <div className="flex-1 space-y-3 overflow-y-auto p-4">
  {index.length === 0 ? (
  <div className="flex flex-col items-center justify-center py-12 text-center">
- <span className="text-3xl"></span>
- <p className="mt-2 text-stone-600">Aucune zone téléchargée</p>
+ <p className="mt-2 text-stone-600">{t('Aucune zone téléchargée')}</p>
  <p className="mt-1 max-w-xs text-sm text-stone-400">
- Connecté, télécharge une zone pour la consulter hors ligne en voyage.
+ {t('Connecté, télécharge une zone pour la consulter hors ligne en voyage.')}
  </p>
  </div>
  ) : (
@@ -85,7 +86,7 @@ export default function DownloadedZonesSheet({ open, onClose }: { open: boolean;
  day: 'numeric',
  month: 'long',
  })}{' '}
- · {zone.placeCount} lieux · {formatBytes(zone.sizeBytes)}
+ · {zone.placeCount} {t('lieux')} · {formatBytes(zone.sizeBytes)}
  </p>
  <p className="mt-0.5 text-xs text-stone-400">
  {zone.categories.join(', ')}
@@ -93,7 +94,7 @@ export default function DownloadedZonesSheet({ open, onClose }: { open: boolean;
  </div>
  {expired && (
  <span className="flex-shrink-0 rounded bg-amber-500/15 px-1.5 py-0.5 text-[10px] text-amber-700">
- à rafraîchir
+ {t('à rafraîchir')}
  </span>
  )}
  </div>

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { AggregateResult, MergedPlace } from '../core'
 import { useAppStore } from '../store/useAppStore'
+import { useI18n } from '../lib/i18n'
 import PlaceCard from './PlaceCard'
 
 /**
@@ -39,6 +40,7 @@ function Section({
 }
 
 export default function TieredResults({ result }: { result: AggregateResult }) {
+  const { t } = useI18n()
   const [showAll, setShowAll] = useState(false)
   const selectedId = useAppStore((s) => s.selectedPlaceId)
   const openDetail = useAppStore((s) => s.openDetail)
@@ -49,9 +51,9 @@ export default function TieredResults({ result }: { result: AggregateResult }) {
 
   return (
     <div className="space-y-7">
-      <Section title="Crème de la crème" hint="valeurs sûres" places={result.creme} selectedId={selectedId} onSelect={onSelect} />
-      <Section title="Excellents choix" places={result.excellents} selectedId={selectedId} onSelect={onSelect} />
-      <Section title="Pépites" hint="peu connues, très bien notées" places={result.pepites} selectedId={selectedId} onSelect={onSelect} />
+      <Section title={t('Crème de la crème')} hint={t('valeurs sûres')} places={result.creme} selectedId={selectedId} onSelect={onSelect} />
+      <Section title={t('Excellents choix')} places={result.excellents} selectedId={selectedId} onSelect={onSelect} />
+      <Section title={t('Pépites')} hint={t('peu connues, très bien notées')} places={result.pepites} selectedId={selectedId} onSelect={onSelect} />
 
       {extra.length > 0 && (
         <div>
@@ -59,7 +61,7 @@ export default function TieredResults({ result }: { result: AggregateResult }) {
             onClick={() => setShowAll((v) => !v)}
             className="w-full rounded-full border border-line py-2.5 text-sm font-medium text-stone-600 hover:bg-white hover:text-ink"
           >
-            {showAll ? 'Réduire' : `Voir plus de résultats (${extra.length})`}
+            {showAll ? t('Réduire') : `${t('Voir plus de résultats')} (${extra.length})`}
           </button>
           {showAll && (
             <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">

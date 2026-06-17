@@ -2,6 +2,7 @@ import type { MergedPlace } from '../core'
 import { SOURCE_LABEL, TIER_BADGE, formatDistance, priceText } from '../lib/format'
 import FavoriteButton from './FavoriteButton'
 import Icon from './Icon'
+import { useI18n } from '../lib/i18n'
 
 /**
  * Carte de lieu : grande photo, nom, note, palier, consensus multi-sources,
@@ -15,6 +16,7 @@ interface PlaceCardProps {
 }
 
 export default function PlaceCard({ place, selected, onSelect }: PlaceCardProps) {
+  const { t } = useI18n()
   const consensus = place.sources.length >= 2
   const tier = place.tier
 
@@ -59,7 +61,7 @@ export default function PlaceCard({ place, selected, onSelect }: PlaceCardProps)
         {consensus && (
           <span className="absolute right-12 top-3 flex items-center gap-1 rounded-full bg-white/90 px-2 py-1 text-[11px] font-medium text-emerald-700 shadow-sm">
             <Icon name="check" size={11} strokeWidth={2.5} />
-            {place.sources.length} sources
+            {place.sources.length} {t('sources')}
           </span>
         )}
 
@@ -81,12 +83,12 @@ export default function PlaceCard({ place, selected, onSelect }: PlaceCardProps)
               )}
             </span>
           ) : (
-            <span className="text-stone-400">Pas de note</span>
+            <span className="text-stone-400">{t('Pas de note')}</span>
           )}
           {place.priceLevel && <span>{priceText(place.priceLevel)}</span>}
           {place.distanceM !== null && <span>{formatDistance(place.distanceM)}</span>}
-          {place.openNow === true && <span className="text-emerald-700">Ouvert</span>}
-          {place.openNow === false && <span className="text-red-700">Fermé</span>}
+          {place.openNow === true && <span className="text-emerald-700">{t('Ouvert')}</span>}
+          {place.openNow === false && <span className="text-red-700">{t('Fermé')}</span>}
           <span className="ml-auto text-stone-400">
             {consensus
               ? place.sources.map((s) => SOURCE_LABEL[s]).join(' + ')

@@ -1,5 +1,6 @@
 import type { RentalOffer } from '../../adapters/rentals'
 import { offerPriceIn, formatMoney, type FxRates } from '../../core/currency'
+import { useI18n } from '../../lib/i18n'
 
 /** Carte comparative d'une offre de location (depuis une API partenaire). */
 export default function RentalOfferCard({
@@ -11,6 +12,7 @@ export default function RentalOfferCard({
  displayCurrency: string
  fx: FxRates | null
 }) {
+ const { t } = useI18n()
  const total = offerPriceIn(offer, displayCurrency, fx)
  const perDay = fx ? offerPriceIn({ ...offer, priceTotal: offer.pricePerDay }, displayCurrency, fx) : offer.pricePerDay
 
@@ -34,12 +36,12 @@ export default function RentalOfferCard({
  <p className="text-xs text-stone-400">
  {offer.supplier} · {offer.category}
  {offer.transmission ? ` · ${offer.transmission}` : ''}
- {offer.seats ? ` · ${offer.seats} places` : ''}
+ {offer.seats ? ` · ${offer.seats} ${t('places')}` : ''}
  </p>
  <div className="mt-1 flex flex-wrap gap-x-3 text-xs text-stone-500">
  <span>{offer.mileage}</span>
  <span className={offer.insuranceIncluded ? 'text-emerald-700' : 'text-stone-400'}>
- {offer.insuranceIncluded ? 'assurance incluse' : 'assurance en option'}
+ {offer.insuranceIncluded ? t('assurance incluse') : t('assurance en option')}
  </span>
  {offer.rating != null && <span>{offer.rating.toFixed(1)}</span>}
  </div>
@@ -60,7 +62,7 @@ export default function RentalOfferCard({
  rel="noopener noreferrer"
  className="rounded-lg bg-accent px-3 py-1.5 text-xs font-semibold text-white hover:bg-accent-dark"
  >
- Réserver
+ {t('Réserver')}
  </a>
  </div>
  </div>

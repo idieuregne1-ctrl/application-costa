@@ -41,6 +41,12 @@ interface AppState {
   viewMode: ViewMode
   setViewMode: (mode: ViewMode) => void
 
+  /** Langue de l'interface et devise d'affichage (préférences globales). */
+  lang: 'fr' | 'en'
+  setLang: (lang: 'fr' | 'en') => void
+  currency: string
+  setCurrency: (currency: string) => void
+
   selectedPlaceId: string | null
   setSelectedPlaceId: (id: string | null) => void
 
@@ -85,6 +91,11 @@ export const useAppStore = create<AppState>()(
       viewMode: 'list',
       setViewMode: (viewMode) => set({ viewMode }),
 
+      lang: 'fr',
+      setLang: (lang) => set({ lang }),
+      currency: 'EUR',
+      setCurrency: (currency) => set({ currency }),
+
       selectedPlaceId: null,
       setSelectedPlaceId: (selectedPlaceId) => set({ selectedPlaceId }),
 
@@ -102,6 +113,8 @@ export const useAppStore = create<AppState>()(
         activeSources: state.activeSources,
         position: state.position,
         positionLabel: state.positionLabel,
+        lang: state.lang,
+        currency: state.currency,
       }),
       // Fusion profonde avec les défauts : un état persisté plus ancien (sans
       // certains champs de filtre) ne casse pas l'app et récupère les défauts.

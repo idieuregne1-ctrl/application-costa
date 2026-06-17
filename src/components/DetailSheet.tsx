@@ -7,12 +7,14 @@ import ReviewSummarySection from './ReviewSummarySection'
 import WeatherCard, { isOutdoor } from './WeatherCard'
 import FavoriteButton from './FavoriteButton'
 import Icon from './Icon'
+import { useI18n } from '../lib/i18n'
 
 /**
  * Fiche détail en bottom sheet : carrousel photos, note agrégée, consensus,
  * prix, distance, horaire, résumé d'avis IA, météo, et bouton « Y aller ».
  */
 export default function DetailSheet({ places }: { places: MergedPlace[] }) {
+  const { t } = useI18n()
   const detailId = useAppStore((s) => s.detailPlaceId)
   const close = useAppStore((s) => s.closeDetail)
   const favorites = useFavorites((s) => s.favorites)
@@ -70,34 +72,34 @@ export default function DetailSheet({ places }: { places: MergedPlace[] }) {
                 <Icon name="star" size={14} className="text-accent" />
                 {place.rating.toFixed(1)}
                 {place.reviewCount !== null && (
-                  <span className="font-normal text-stone-400"> · {place.reviewCount} avis</span>
+                  <span className="font-normal text-stone-400"> · {place.reviewCount} {t('avis')}</span>
                 )}
               </span>
             ) : (
-              <span className="text-stone-400">Pas encore de note</span>
+              <span className="text-stone-400">{t('Pas encore de note')}</span>
             )}
             {place.priceLevel && <span>{priceText(place.priceLevel)}</span>}
             {place.distanceM !== null && <span>{formatDistance(place.distanceM)}</span>}
-            {place.openNow === true && <span className="text-emerald-700">Ouvert maintenant</span>}
-            {place.openNow === false && <span className="text-red-700">Fermé</span>}
+            {place.openNow === true && <span className="text-emerald-700">{t('Ouvert maintenant')}</span>}
+            {place.openNow === false && <span className="text-red-700">{t('Fermé')}</span>}
           </div>
 
           {place.sources.length >= 2 ? (
             <p className="flex items-center gap-1.5 rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-800">
               <Icon name="check" size={15} strokeWidth={2.5} />
-              Recommandé sur {place.sources.map((s) => SOURCE_LABEL[s]).join(' + ')}
+              {t('Recommandé sur')} {place.sources.map((s) => SOURCE_LABEL[s]).join(' + ')}
             </p>
           ) : (
-            <p className="text-xs text-stone-400">Source : {SOURCE_LABEL[place.sources[0]]}</p>
+            <p className="text-xs text-stone-400">{t('Source')} : {SOURCE_LABEL[place.sources[0]]}</p>
           )}
 
           {place.trail && (
             <div className="grid grid-cols-2 gap-2 rounded-lg border border-line bg-white p-3 text-sm text-stone-700">
-              {place.trail.distanceKm != null && <span>Distance · {place.trail.distanceKm} km</span>}
-              {place.trail.elevationGainM != null && <span>Dénivelé · {place.trail.elevationGainM} m D+</span>}
-              {place.trail.difficulty && <span>Difficulté · {place.trail.difficulty}</span>}
+              {place.trail.distanceKm != null && <span>{t('Distance')} · {place.trail.distanceKm} km</span>}
+              {place.trail.elevationGainM != null && <span>{t('Dénivelé')} · {place.trail.elevationGainM} m D+</span>}
+              {place.trail.difficulty && <span>{t('Difficulté')} · {place.trail.difficulty}</span>}
               {place.trail.estimatedDurationMin != null && (
-                <span>Durée · {Math.round(place.trail.estimatedDurationMin / 60)} h</span>
+                <span>{t('Durée')} · {Math.round(place.trail.estimatedDurationMin / 60)} h</span>
               )}
             </div>
           )}
@@ -113,8 +115,7 @@ export default function DetailSheet({ places }: { places: MergedPlace[] }) {
 
           {place.category === 'fishing' && (
             <p className="rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800">
-              Vérifiez le permis et la réglementation de pêche locaux avant de partir. Les
-              informations sur ces spots peuvent être incomplètes.
+              {t('Vérifiez le permis et la réglementation de pêche locaux avant de partir. Les informations sur ces spots peuvent être incomplètes.')}
             </p>
           )}
 
@@ -128,7 +129,7 @@ export default function DetailSheet({ places }: { places: MergedPlace[] }) {
               className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-accent py-3 font-medium text-white hover:bg-accent-dark"
             >
               <Icon name="navigation" size={17} />
-              Y aller
+              {t('Y aller')}
             </a>
             {place.sourceUrl && (
               <a
@@ -137,7 +138,7 @@ export default function DetailSheet({ places }: { places: MergedPlace[] }) {
                 rel="noopener noreferrer"
                 className="flex items-center justify-center rounded-xl border border-line px-4 py-3 text-sm text-stone-600 hover:bg-white"
               >
-                Source
+                {t('Source')}
               </a>
             )}
           </div>

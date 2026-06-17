@@ -1,6 +1,7 @@
 import { useWeather } from '../hooks/useWeather'
 import { describeWeather, timeOf } from '../lib/weather'
 import type { Coords } from '../store/useAppStore'
+import { useI18n } from '../lib/i18n'
 
 /**
  * Indice météo du jour au-dessus des résultats plein air (rando/pêche/plage).
@@ -16,6 +17,7 @@ export default function WeatherHint({
   position: Coords
   category: string
 }) {
+  const { t } = useI18n()
   const { data } = useWeather(position.lat, position.lng, COASTAL.has(category), true)
   const today = data?.daily[0]
   if (!today) return null
@@ -23,8 +25,8 @@ export default function WeatherHint({
   const { emoji, label } = describeWeather(today.weatherCode)
   const rainy = (today.precipProbabilityMax ?? 0) >= 50
   const sentiment = rainy
-    ? { text: 'Risque de pluie aujourd’hui', cls: 'text-amber-700' }
-    : { text: 'Bonne journée pour sortir', cls: 'text-emerald-700' }
+    ? { text: t('Risque de pluie aujourd’hui'), cls: 'text-amber-700' }
+    : { text: t('Bonne journée pour sortir'), cls: 'text-emerald-700' }
 
   return (
     <div className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-xl border border-line bg-white px-3 py-2 text-xs">
@@ -35,7 +37,7 @@ export default function WeatherHint({
       <span className="text-stone-500">{label}</span>
       <span className={sentiment.cls}>· {sentiment.text}</span>
       <span className="ml-auto text-stone-400">
-        Lever {timeOf(today.sunrise)} · Coucher {timeOf(today.sunset)}
+        {t('Lever')} {timeOf(today.sunrise)} · {t('Coucher')} {timeOf(today.sunset)}
       </span>
     </div>
   )

@@ -10,8 +10,9 @@ import {
 } from '../core/rentalFilters'
 import RentalSearchForm from '../components/rentals/RentalSearchForm'
 import RentalOfferCard from '../components/rentals/RentalOfferCard'
+import { useAppStore } from '../store/useAppStore'
+import { useI18n } from '../lib/i18n'
 
-const CURRENCIES = ['EUR', 'USD', 'GBP', 'CHF', 'CAD']
 const SORTS: { value: RentalSortBy; label: string }[] = [
  { value: 'priceTotal', label: 'Prix total' },
  { value: 'pricePerDay', label: 'Prix/jour' },
@@ -20,8 +21,9 @@ const SORTS: { value: RentalSortBy; label: string }[] = [
 ]
 
 export default function RentalsPage() {
+ const { t } = useI18n()
+ const currency = useAppStore((s) => s.currency)
  const [search, setSearch] = useState<RentalSearch | null>(null)
- const [currency, setCurrency] = useState('EUR')
  const [filters, setFilters] = useState<RentalFilters>(DEFAULT_RENTAL_FILTERS)
 
  const { data, isLoading, isError, error } = useRentals(search)
@@ -36,11 +38,9 @@ export default function RentalsPage() {
  return (
  <div className="mx-auto flex min-h-full max-w-2xl flex-col px-4 py-6">
  <header className="mb-4">
- <h1 className="text-2xl font-bold tracking-tight">
- Location <span className="text-accent">de véhicules</span>
- </h1>
+ <h1 className="font-serif text-2xl text-ink">{t('Location de véhicules')}</h1>
  <p className="mt-1 text-sm text-stone-500">
- Compare auto & moto à travers plusieurs loueurs — réservation sur leur site.
+ {t('Compare auto & moto à travers plusieurs loueurs — réservation sur leur site.')}
  </p>
  </header>
 
@@ -48,10 +48,10 @@ export default function RentalsPage() {
 
  {search && (
  <div className="mt-5 space-y-4">
- {isLoading && <p className="text-sm text-stone-500">Recherche des offres…</p>}
+ {isLoading && <p className="text-sm text-stone-500">{t('Recherche des offres…')}</p>}
  {isError && (
  <p className="text-sm text-amber-700">
- {error instanceof Error ? error.message : 'Erreur lors de la recherche.'}
+ {error instanceof Error ? error.message : t('Erreur inconnue.')}
  </p>
  )}
 
@@ -59,27 +59,16 @@ export default function RentalsPage() {
  {offers.length > 0 && (
  <section className="space-y-3">
  <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-stone-500">
- <span>{visibleOffers.length} offre(s)</span>
- <div className="flex items-center gap-2">
+ <span>{visibleOffers.length} {t('offres')}</span>
  <select
  value={filters.sortBy}
  onChange={(e) => setFilters((f) => ({ ...f, sortBy: e.target.value as RentalSortBy }))}
  className="rounded-lg border border-line bg-paper px-2 py-1"
  >
  {SORTS.map((s) => (
- <option key={s.value} value={s.value}>{s.label}</option>
+ <option key={s.value} value={s.value}>{t(s.label)}</option>
  ))}
  </select>
- <select
- value={currency}
- onChange={(e) => setCurrency(e.target.value)}
- className="rounded-lg border border-line bg-paper px-2 py-1"
- >
- {CURRENCIES.map((c) => (
- <option key={c} value={c}>{c}</option>
- ))}
- </select>
- </div>
  </div>
  <div className="space-y-2">
  {visibleOffers.map((o) => (
@@ -106,12 +95,13 @@ function RedirectsSection({
  note?: string
  hasOffers: boolean
 }) {
+ const { t } = useI18n()
  if (redirects.length === 0) return null
  const partial = redirects.some((r) => r.coverage === 'partial')
  return (
  <section className="space-y-2 rounded-2xl border border-line bg-white p-4">
  <h2 className="text-sm font-semibold text-ink">
- {hasOffers ? 'Comparer aussi directement chez les loueurs' : 'Comparer chez les loueurs'}
+ {hasOffers ? t('Comparer aussi directement chez les loueurs') : t('Comparer chez les loueurs')}
  </h2>
  {!hasOffers && note && <p className="text-xs text-stone-400">{note}</p>}
  <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
@@ -130,7 +120,7 @@ function RedirectsSection({
  </div>
  {partial && (
  <p className="text-[11px] text-amber-700/80">
- Couverture moto partielle selon les destinations.
+ {t('Couverture moto partielle selon les destinations.')}
  </p>
  )}
  </section>

@@ -1,12 +1,14 @@
 import { useAppStore } from '../store/useAppStore'
 import { filtersEqual } from '../core'
 import { PRESETS, presetFilters } from '../lib/presets'
+import { useI18n } from '../lib/i18n'
 
 /**
  * Raccourcis contextuels (chips) : un tap applique catégorie + filtres + tri.
  * Le chip s'allume quand l'état courant correspond exactement au preset.
  */
 export default function PresetChips() {
+  const { t } = useI18n()
   const activeCategory = useAppStore((s) => s.activeCategory)
   const filters = useAppStore((s) => s.filters)
   const setActiveCategory = useAppStore((s) => s.setActiveCategory)
@@ -36,7 +38,7 @@ export default function PresetChips() {
                   : 'border-line bg-white text-stone-600 hover:text-ink',
               ].join(' ')}
             >
-              {preset.label}
+              {t(preset.label)}
             </button>
           )
         })}

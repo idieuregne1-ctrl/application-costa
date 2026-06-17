@@ -1,6 +1,7 @@
 import { useFavorites } from '../store/useFavorites'
 import { useAppStore } from '../store/useAppStore'
 import PlaceCard from './PlaceCard'
+import { useI18n } from '../lib/i18n'
 
 /**
  * Panneau des favoris (sauvegardés en IndexedDB, sans compte).
@@ -8,6 +9,7 @@ import PlaceCard from './PlaceCard'
  * alimenteront le planificateur de journée (Phase 10).
  */
 export default function FavoritesSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
+ const { t } = useI18n()
  // Sélectionner l'objet stable, puis dériver le tableau (éviter une nouvelle
  // référence à chaque rendu, qui boucle avec Zustand v5).
  const favoritesMap = useFavorites((s) => s.favorites)
@@ -26,10 +28,10 @@ export default function FavoritesSheet({ open, onClose }: { open: boolean; onClo
  className="relative flex h-full w-full max-w-md flex-col bg-paper shadow-2xl"
  >
  <header className="flex items-center justify-between border-b border-line p-4">
- <h2 className="text-lg font-semibold text-ink">Mes favoris</h2>
+ <h2 className="font-serif text-lg text-ink">{t('Mes favoris')}</h2>
  <button
  onClick={onClose}
- aria-label="Fermer"
+ aria-label={t('Fermer')}
  className="flex h-8 w-8 items-center justify-center rounded-full text-stone-500 hover:bg-stone-100"
  >
  ✕
@@ -40,9 +42,9 @@ export default function FavoritesSheet({ open, onClose }: { open: boolean; onClo
  {favorites.length === 0 ? (
  <div className="flex h-full flex-col items-center justify-center text-center">
  <span className="text-3xl"></span>
- <p className="mt-2 text-stone-600">Aucun favori</p>
+ <p className="mt-2 text-stone-600">{t('Aucun favori')}</p>
  <p className="mt-1 max-w-xs text-sm text-stone-400">
- Touche le cœur sur un lieu pour le sauvegarder ici.
+ {t('Touche le cœur sur un lieu pour le sauvegarder ici.')}
  </p>
  </div>
  ) : (

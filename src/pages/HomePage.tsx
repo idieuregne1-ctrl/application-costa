@@ -19,6 +19,7 @@ import { isOutdoor } from '../components/WeatherCard'
 import OfflineBanner from '../components/OfflineBanner'
 import DownloadedZonesSheet from '../components/DownloadedZonesSheet'
 import Icon, { type IconName } from '../components/Icon'
+import { useI18n } from '../lib/i18n'
 import { useZones } from '../store/useZones'
 import { useFavorites } from '../store/useFavorites'
 import { usePlanner } from '../store/usePlanner'
@@ -70,6 +71,7 @@ function IconButton({
 }
 
 export default function HomePage() {
+  const { t } = useI18n()
   const activeCategory = useAppStore((s) => s.activeCategory)
   const setActiveCategory = useAppStore((s) => s.setActiveCategory)
   const position = useAppStore((s) => s.position)
@@ -97,10 +99,10 @@ export default function HomePage() {
       <header className="mb-5 flex items-start justify-between gap-3">
         <div>
           <h1 className="text-[28px] font-semibold leading-tight text-ink">
-            Application de voyage
+            {t('Application de voyage')}
           </h1>
           <p className="mt-1 text-sm text-stone-500">
-            Le meilleur autour de vous, soigneusement sélectionné.
+            {t('Le meilleur autour de vous, soigneusement sélectionné.')}
           </p>
         </div>
         <div className="flex flex-shrink-0 items-center gap-2">
@@ -135,7 +137,7 @@ export default function HomePage() {
                   active ? 'border-accent text-ink' : 'border-transparent text-stone-400 hover:text-ink',
                 ].join(' ')}
               >
-                {cat.label}
+                {t(cat.label)}
               </button>
             )
           })}
@@ -150,7 +152,7 @@ export default function HomePage() {
             className="flex flex-shrink-0 items-center gap-2 rounded-full border border-line px-3.5 py-2 text-sm font-medium text-ink transition-colors hover:bg-white"
           >
             <Icon name="sliders" size={16} />
-            Filtres
+            {t('Filtres')}
             {filterCount > 0 && (
               <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-accent px-1.5 text-[11px] font-semibold text-white">
                 {filterCount}
@@ -167,8 +169,8 @@ export default function HomePage() {
         {position === null ? (
           <EmptyState
             icon="pin"
-            title="Choisissez un point de départ"
-            text="Activez votre position ou cherchez une ville pour découvrir le meilleur autour."
+            title={t('Choisissez un point de départ')}
+            text={t('Activez votre position ou cherchez une ville pour découvrir le meilleur autour.')}
           />
         ) : (
           <Results category={activeCategory} />
@@ -184,10 +186,11 @@ export default function HomePage() {
 }
 
 function Results({ category }: { category: PlaceCategory }) {
+  const { t } = useI18n()
   const { results, isLoading, isError, error, refetch, sortBy } = usePlaceResults(category)
 
   if (!isCategoryImplemented(category)) {
-    return <EmptyState icon="compass" title="Bientôt disponible" text="Cette catégorie arrive prochainement." />
+    return <EmptyState icon="compass" title={t('Bientôt disponible')} text={t('Cette catégorie arrive prochainement.')} />
   }
 
   if (isLoading) {
@@ -204,9 +207,9 @@ function Results({ category }: { category: PlaceCategory }) {
     return (
       <EmptyState
         icon="wifi-off"
-        title="Échec du chargement"
-        text={error instanceof Error ? error.message : 'Erreur inconnue.'}
-        action={{ label: 'Réessayer', onClick: () => refetch() }}
+        title={t('Échec du chargement')}
+        text={error instanceof Error ? error.message : t('Erreur inconnue.')}
+        action={{ label: t('Réessayer'), onClick: () => refetch() }}
       />
     )
   }
@@ -215,8 +218,8 @@ function Results({ category }: { category: PlaceCategory }) {
     return (
       <EmptyState
         icon="search"
-        title="Aucun résultat"
-        text="Rien ne correspond ici. Élargissez le rayon, assouplissez les filtres, ou changez de zone."
+        title={t('Aucun résultat')}
+        text={t('Rien ne correspond ici. Élargissez le rayon, assouplissez les filtres, ou changez de zone.')}
       />
     )
   }
@@ -233,6 +236,7 @@ function ResultsBody({
   sortBy: string
   category: PlaceCategory
 }) {
+  const { t } = useI18n()
   const viewMode = useAppStore((s) => s.viewMode)
   const setViewMode = useAppStore((s) => s.setViewMode)
   const selectedId = useAppStore((s) => s.selectedPlaceId)
@@ -267,22 +271,24 @@ function ResultsBody({
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-2 text-xs text-stone-500">
         <span>
-          {results.filtered.length} lieux sur {results.rawCount}
+          {results.filtered.length} / {results.rawCount} {t('lieux')}
         </span>
         <div className="flex items-center gap-2">
           <button onClick={download} className={toolBtn}>
             <Icon name={downloaded ? 'check' : 'download'} size={15} />
-            <span className="hidden sm:inline">{downloaded ? 'Téléchargé' : 'Télécharger'}</span>
+            <span className="hidden sm:inline">{downloaded ? t('Téléchargé') : t('Télécharger')}</span>
           </button>
           <button onClick={() => setSurpriseOpen(true)} className={toolBtn}>
             <Icon name="dice" size={15} />
-            <span className="hidden sm:inline">Surprends-moi</span>
+            <span className="hidden sm:inline">{t('Surprends-moi')}</span>
           </button>
           <ViewToggle mode={viewMode} onChange={setViewMode} />
         </div>
       </div>
       {results.failedSources.length > 0 && (
-        <p className="text-xs text-amber-700">Source(s) en échec : {results.failedSources.join(', ')}</p>
+        <p className="text-xs text-amber-700">
+          {t('Source(s) en échec :')} {results.failedSources.join(', ')}
+        </p>
       )}
 
       {isOutdoor(category) && <WeatherHint position={position} category={category} />}

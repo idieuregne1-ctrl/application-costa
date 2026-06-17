@@ -1,6 +1,7 @@
 import type { MergedPlace } from '../core'
 import { useWeather } from '../hooks/useWeather'
 import { describeWeather, timeOf, shortDay } from '../lib/weather'
+import { useI18n } from '../lib/i18n'
 
 /**
  * Encart météo de la fiche détail (lieux de plein air) : conditions actuelles,
@@ -18,6 +19,7 @@ export function isOutdoor(category: string): boolean {
 }
 
 export default function WeatherCard({ place, open }: { place: MergedPlace; open: boolean }) {
+  const { t: tr } = useI18n()
   const wantsMarine = COASTAL.has(place.category)
   const { data, isLoading, isError } = useWeather(place.lat, place.lng, wantsMarine, open)
 
@@ -25,7 +27,7 @@ export default function WeatherCard({ place, open }: { place: MergedPlace; open:
     return <div className="h-24 animate-pulse rounded-xl bg-stone-200/60" />
   }
   if (isError || !data) {
-    return <p className="text-xs text-stone-400">Météo indisponible pour le moment.</p>
+    return <p className="text-xs text-stone-400">{tr('Météo indisponible pour le moment.')}</p>
   }
 
   const today = data.daily[0]
@@ -33,7 +35,7 @@ export default function WeatherCard({ place, open }: { place: MergedPlace; open:
 
   return (
     <section className="rounded-xl border border-line bg-white p-3.5">
-      <h3 className="mb-2.5 text-xs font-semibold uppercase tracking-wide text-stone-400">Météo</h3>
+      <h3 className="mb-2.5 text-xs font-semibold uppercase tracking-wide text-stone-400">{tr('Météo')}</h3>
 
       {/* Conditions actuelles + soleil */}
       <div className="flex items-center justify-between">
@@ -48,8 +50,8 @@ export default function WeatherCard({ place, open }: { place: MergedPlace; open:
         )}
         {today && (
           <div className="text-right text-xs text-stone-500">
-            <p>Lever {timeOf(today.sunrise)}</p>
-            <p>Coucher {timeOf(today.sunset)}</p>
+            <p>{tr('Lever')} {timeOf(today.sunrise)}</p>
+            <p>{tr('Coucher')} {timeOf(today.sunset)}</p>
           </div>
         )}
       </div>
@@ -58,7 +60,7 @@ export default function WeatherCard({ place, open }: { place: MergedPlace; open:
       <div className="mt-3 grid grid-cols-5 gap-1.5 text-center">
         {data.daily.map((d, i) => (
           <div key={d.date} className="rounded-lg bg-stone-50 py-2">
-            <p className="text-[11px] text-stone-400">{i === 0 ? 'Auj.' : shortDay(d.date)}</p>
+            <p className="text-[11px] text-stone-400">{i === 0 ? tr('Auj.') : shortDay(d.date)}</p>
             <p className="text-base">{describeWeather(d.weatherCode).emoji}</p>
             <p className="text-[11px] font-medium text-ink">{Math.round(d.tempMax)}°</p>
             <p className="text-[10px] text-stone-400">{Math.round(d.tempMin)}°</p>
@@ -73,10 +75,10 @@ export default function WeatherCard({ place, open }: { place: MergedPlace; open:
       {data.marine && (data.marine.current.waveHeight !== null || data.marine.current.seaSurfaceTemp !== null) && (
         <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 border-t border-line pt-2.5 text-xs text-stone-600">
           {data.marine.current.waveHeight !== null && (
-            <span>Vagues {data.marine.current.waveHeight.toFixed(1)} m</span>
+            <span>{tr('Vagues')} {data.marine.current.waveHeight.toFixed(1)} m</span>
           )}
           {data.marine.current.seaSurfaceTemp !== null && (
-            <span>Mer {Math.round(data.marine.current.seaSurfaceTemp)}°C</span>
+            <span>{tr('Mer')} {Math.round(data.marine.current.seaSurfaceTemp)}°C</span>
           )}
         </div>
       )}

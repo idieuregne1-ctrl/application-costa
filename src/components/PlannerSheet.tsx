@@ -10,6 +10,7 @@ import {
  buildShareUrl,
  type PlanStop,
 } from '../lib/planner'
+import { useI18n } from '../lib/i18n'
 
 /**
  * Planificateur de journée : ordonne les favoris en itinéraire, affiche le temps
@@ -17,6 +18,7 @@ import {
  * par glisser-déposer (ou flèches). Partage par lien + ouverture dans Google Maps.
  */
 export default function PlannerSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
+ const { t } = useI18n()
  const stops = usePlanner((s) => s.stops)
  const addStops = usePlanner((s) => s.addStops)
  const removeStop = usePlanner((s) => s.removeStop)
@@ -58,10 +60,10 @@ export default function PlannerSheet({ open, onClose }: { open: boolean; onClose
  className="relative flex h-full w-full max-w-md flex-col bg-paper shadow-2xl"
  >
  <header className="flex items-center justify-between border-b border-line p-4">
- <h2 className="text-lg font-semibold text-ink">Planificateur de journée</h2>
+ <h2 className="font-serif text-lg text-ink">{t('Planificateur de journée')}</h2>
  <button
  onClick={onClose}
- aria-label="Fermer"
+ aria-label={t('Fermer')}
  className="flex h-8 w-8 items-center justify-center rounded-full text-stone-500 hover:bg-stone-100"
  >
  ✕
@@ -75,16 +77,15 @@ export default function PlannerSheet({ open, onClose }: { open: boolean; onClose
  onClick={() => addStops(favorites.map(planStopFrom))}
  className="w-full rounded-lg border border-line py-2 text-sm font-medium text-ink hover:bg-stone-100"
  >
- Ajouter mes favoris ({favorites.length})
+ {t('Ajouter mes favoris')} ({favorites.length})
  </button>
  )}
 
  {stops.length === 0 ? (
  <div className="flex flex-col items-center justify-center py-12 text-center">
- <span className="text-3xl"></span>
- <p className="mt-2 text-stone-600">Itinéraire vide</p>
+ <p className="mt-2 text-stone-600">{t('Itinéraire vide')}</p>
  <p className="mt-1 max-w-xs text-sm text-stone-400">
- Ajoute des favoris pour composer ta journée et voir les temps de trajet.
+ {t('Ajoute des favoris pour composer ta journée et voir les temps de trajet.')}
  </p>
  </div>
  ) : (
@@ -120,9 +121,9 @@ export default function PlannerSheet({ open, onClose }: { open: boolean; onClose
  <footer className="space-y-3 border-t border-line p-4">
  <div className="flex justify-between text-sm">
  <span className="text-stone-500">
- {stops.length} arrêts · trajet {route.data?.totalDuration ? formatDuration(travelSec) : '—'}
+ {stops.length} {t('arrêts')} · {t('trajet')} {route.data?.totalDuration ? formatDuration(travelSec) : '—'}
  </span>
- <span className="font-semibold text-ink">Total ≈ {formatDuration(totalSec)}</span>
+ <span className="font-semibold text-ink">{t('Total')} ≈ {formatDuration(totalSec)}</span>
  </div>
  <div className="flex gap-2">
  <a
@@ -137,14 +138,14 @@ export default function PlannerSheet({ open, onClose }: { open: boolean; onClose
  onClick={share}
  className="flex flex-1 items-center justify-center rounded-xl border border-line py-3 text-sm font-medium text-ink hover:bg-stone-100"
  >
- {copied ? '✓ Copié !' : 'Partager'}
+ {copied ? `✓ ${t('Copié !')}` : t('Partager')}
  </button>
  </div>
  <button
  onClick={clear}
  className="w-full text-center text-xs text-stone-400 hover:text-stone-600"
  >
- Vider l'itinéraire
+ {t("Vider l'itinéraire")}
  </button>
  </footer>
  )}

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import type { MergedPlace } from '../core'
 import { useAppStore } from '../store/useAppStore'
 import PlaceCard from './PlaceCard'
+import { useI18n } from '../lib/i18n'
 
 /**
  * Mode « Surprends-moi » : propose 3-4 suggestions tirées au hasard parmi les
@@ -30,6 +31,7 @@ export default function SurpriseSheet({
  onClose: () => void
  pool: MergedPlace[]
 }) {
+ const { t } = useI18n()
  const openDetail = useAppStore((s) => s.openDetail)
  const [picks, setPicks] = useState<MergedPlace[]>([])
 
@@ -52,10 +54,10 @@ export default function SurpriseSheet({
  className="relative max-h-[88vh] w-full max-w-lg overflow-y-auto rounded-t-3xl bg-paper p-4 sm:rounded-3xl"
  >
  <div className="mb-3 flex items-center justify-between">
- <h2 className="text-lg font-semibold text-ink">Surprends-moi</h2>
+ <h2 className="font-serif text-lg text-ink">{t('Surprends-moi')}</h2>
  <button
  onClick={onClose}
- aria-label="Fermer"
+ aria-label={t('Fermer')}
  className="flex h-8 w-8 items-center justify-center rounded-full text-stone-500 hover:bg-stone-100"
  >
  ✕
@@ -64,7 +66,7 @@ export default function SurpriseSheet({
 
  {picks.length === 0 ? (
  <p className="py-8 text-center text-sm text-stone-400">
- Pas assez de lieux ici pour proposer une sélection.
+ {t('Pas assez de lieux ici pour proposer une sélection.')}
  </p>
  ) : (
  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -78,7 +80,7 @@ export default function SurpriseSheet({
  onClick={regenerate}
  className="mt-4 w-full rounded-xl bg-accent py-3 font-semibold text-white hover:bg-accent-dark"
  >
- Régénère
+ {t('Régénère')}
  </button>
  </div>
  </div>
